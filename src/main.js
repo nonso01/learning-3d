@@ -2,7 +2,7 @@ import * as T from "three"
 import eruda from "eruda"
 import { log, w, dq } from "./util"
 
-eruda.init()
+//eruda.init()
 
 const app = dq("#app")
 
