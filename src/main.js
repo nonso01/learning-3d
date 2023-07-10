@@ -1,8 +1,11 @@
 import * as T from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls";
+
 import eruda from "eruda";
+
 import { log, w, dq } from "./util";
 
-eruda.init();
+// eruda.init();
 
 const app = dq("#app");
 
@@ -13,7 +16,9 @@ const Camera = new T.PerspectiveCamera(
   0.1,
   1000,
 );
-const Renderer = new T.WebGLRenderer();
+const Renderer = new T.WebGLRenderer({
+  antialias: true,
+});
 
 Renderer.setSize(w.innerWidth, w.innerHeight);
 
@@ -32,6 +37,10 @@ const box = new T.Mesh(boxGeo, boxMesh);
 for (const s of [box, light]) Scene.add(s);
 
 Camera.position.z = 5;
+
+const controls = new OrbitControls(Camera, Renderer.domElement);
+controls.minDistance = 3;
+controls.maxDistance = 10;
 
 function animate() {
   requestAnimationFrame(animate);
