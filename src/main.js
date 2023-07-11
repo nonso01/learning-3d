@@ -1,11 +1,12 @@
 import * as T from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls";
+import Stats from 'three/addons/libs/stats.module.js'
 
 import eruda from "eruda";
 
 import { log, dq } from "./util";
 
-//eruda.init();
+// eruda.init();
 
 const app = dq("#app");
 const wireframe = true;
@@ -19,11 +20,15 @@ const Renderer = new T.WebGLRenderer({
 Renderer.setPixelRatio(window.devicePixelRatio);
 Renderer.setSize(_w, _h);
 
-app.append(Renderer.domElement);
+
+const Stat = new Stats()
+
+
+app.append(Renderer.domElement, Stat.dom);
 
 const light = new T.DirectionalLight(0xffffff, 15);
 
-const boxGeo = new T.TorusKnotGeometry(1, 0.35, 70, 70, 2, 1);
+const boxGeo = new T.TorusKnotGeometry(1, 0.35, 75, 75, 2, 1);
 
 const boxMesh = new T.MeshNormalMaterial({
   // color: 0x424242,
@@ -51,6 +56,8 @@ window.addEventListener("resize", handleResize);
 function animate() {
   requestAnimationFrame(animate);
   Renderer.render(Scene, Camera);
+  
+  Stat.update()
 
   box.rotation.x += 0.01;
   box.rotation.y += 0.01;
