@@ -8,6 +8,7 @@ import { log, w, dq } from "./util";
 // eruda.init();
 
 const app = dq("#app");
+const wireframe = true
 
 const Scene = new T.Scene();
 const Camera = new T.PerspectiveCamera(
@@ -24,13 +25,13 @@ Renderer.setSize(w.innerWidth, w.innerHeight);
 
 app.append(Renderer.domElement);
 
-const light = new T.DirectionalLight(0xffffff, 2);
+const light = new T.DirectionalLight(0xffffff, 15);
 
-const boxGeo = new T.BoxGeometry(1, 2, 1);
-/*const boxMesh = new T.MeshStandardMaterial({
-	color: 0x424242
-})*/
-const boxMesh = new T.MeshNormalMaterial();
+const boxGeo = new T.TorusKnotGeometry(1, .35, 70, 70, 2, 1)
+
+const boxMesh = new T.MeshNormalMaterial({
+  // color: 0x424242,
+});
 
 const box = new T.Mesh(boxGeo, boxMesh);
 
@@ -41,6 +42,7 @@ Camera.position.z = 5;
 const controls = new OrbitControls(Camera, Renderer.domElement);
 controls.minDistance = 3;
 controls.maxDistance = 10;
+
 
 function animate() {
   requestAnimationFrame(animate);
