@@ -3,31 +3,27 @@ import { OrbitControls } from "three/addons/controls/OrbitControls";
 
 import eruda from "eruda";
 
-import { log, w, dq } from "./util";
+import { log, dq } from "./util";
 
-// eruda.init();
+eruda.init();
 
 const app = dq("#app");
-const wireframe = true
+const wireframe = true;
+const [_w, _h] = [window.innerWidth, window.innerHeight];
 
 const Scene = new T.Scene();
-const Camera = new T.PerspectiveCamera(
-  75,
-  w.innerWidth / w.innerHeight,
-  0.1,
-  1000,
-);
+const Camera = new T.PerspectiveCamera(75, _w / _h, 0.1, 1000);
 const Renderer = new T.WebGLRenderer({
   antialias: true,
 });
-
-Renderer.setSize(w.innerWidth, w.innerHeight);
+Renderer.setPixelRatio(window.devicePixelRatio);
+Renderer.setSize(_w, _h);
 
 app.append(Renderer.domElement);
 
 const light = new T.DirectionalLight(0xffffff, 15);
 
-const boxGeo = new T.TorusKnotGeometry(1, .35, 70, 70, 2, 1)
+const boxGeo = new T.TorusKnotGeometry(1, 0.35, 70, 70, 2, 1);
 
 const boxMesh = new T.MeshNormalMaterial({
   // color: 0x424242,
@@ -43,6 +39,14 @@ const controls = new OrbitControls(Camera, Renderer.domElement);
 controls.minDistance = 3;
 controls.maxDistance = 10;
 
+function handleResize() {
+  const [_w, _h] = [window.innerWidth, window.innerHeight];
+  Camera.aspect = _w / _h;
+  Camera.updateProjectionMatrix();
+  Renderer.setSize(_w, _h);
+}
+
+window.addEventListener("resize", handleResize);
 
 function animate() {
   requestAnimationFrame(animate);
