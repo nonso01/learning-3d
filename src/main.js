@@ -5,7 +5,7 @@ import eruda from "eruda";
 
 import { log, dq } from "./util";
 
-eruda.init();
+//eruda.init();
 
 const app = dq("#app");
 const wireframe = true;
