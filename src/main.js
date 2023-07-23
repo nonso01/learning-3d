@@ -1,21 +1,30 @@
 import * as T from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls";
-import Stats from 'three/addons/libs/stats.module.js'
+import Stats from "three/addons/libs/stats.module.js";
 
 import eruda from "eruda";
 
-import { log, dq } from "./util.js";
+import { dq } from "./util.js";
 
 // eruda.init();
 
+const log = console.log;
+
 const app = dq("#app");
+
 const wireframe = true;
+
 const [_w, _h] = [window.innerWidth, window.innerHeight];
 
-const bgColor = new T.Color(0xe0e0e9)
+const bgColor = new T.Color(0x000000);
+//0xe0e0e9
+
+let Mesh; // custom
+
+const obj = new T.Object3D();
 
 const Scene = new T.Scene();
-Scene.background = bgColor
+Scene.background = bgColor;
 
 const Camera = new T.PerspectiveCamera(75, _w / _h, 0.1, 1000);
 
@@ -26,41 +35,37 @@ const Renderer = new T.WebGLRenderer({
 Renderer.setPixelRatio(window.devicePixelRatio);
 Renderer.setSize(_w, _h);
 
-
-const Stat = new Stats()
-
+const Stat = new Stats();
 
 app.append(Renderer.domElement, Stat.dom);
 
-const Axes = new T.AxesHelper(5)
+const Axes = new T.AxesHelper(5);
 
-const light = new T.DirectionalLight("red", 15);
-light.position.x = 1
-
-const light_two = new T.DirectionalLight("green", 15)
-light_two.position.y = -1
-
-const light_three = new T.DirectionalLight("blue", 15)
-
-light_three.position.z = -5
-
-
-const geometry_one = new T.DodecahedronGeometry(1.5, 0)
-
-const geometry_one_mat = new T.MeshPhongMaterial({
-  color: "black",
-  // wireframe
+const geo = new T.SphereGeometry(2, 32, 32);
+const mat = new T.MeshBasicMaterial({
+  color: "orange",
+  wireframe,
 });
-
-const geometry_mesh = new T.Mesh(geometry_one, geometry_one_mat);
-
-for (const s of [geometry_mesh, light, light_two, light_three, Axes]) Scene.add(s);
+// const mesh = new T.Mesh(geo, mat)
 
 Camera.position.z = 5;
 
 const controls = new OrbitControls(Camera, Renderer.domElement);
-controls.minDistance = 3;
-controls.maxDistance = 10;
+controls.minDistance = 0;
+controls.maxDistance = 500;
+
+for (const s of [Axes]) Scene.add(s);
+
+for (let i = 0; i < 200; i++) {
+  Mesh = new T.Mesh(geo, mat);
+  obj.add(Mesh);
+
+  Mesh.position.x = i * Math.random() * -10;
+  Mesh.position.y = i * Math.random() * 10;
+  Mesh.position.z = i * Math.random() * 10;
+}
+
+Scene.add(obj);
 
 function handleResize() {
   const [_w, _h] = [window.innerWidth, window.innerHeight];
@@ -74,10 +79,12 @@ window.addEventListener("resize", handleResize);
 function animate() {
   requestAnimationFrame(animate);
   Renderer.render(Scene, Camera);
-  
-  Stat.update()
 
-  geometry_mesh.rotation.x += 0.01;
-  geometry_mesh.rotation.y += 0.01;
+  for (const s of obj.children) {
+    s.rotation.x += 0.01;
+    s.rotation.y += 0.01;
+  }
+
+  Stat.update();
 }
 animate();
