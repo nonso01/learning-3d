@@ -6,7 +6,7 @@ import eruda from "eruda";
 
 import { dq } from "./util.js";
 
-//eruda.init();
+// eruda.init();
 
 const log = console.log;
 
@@ -21,7 +21,7 @@ const bgColor = new T.Color(0x000000);
 
 let Mesh; // custom
 
-const obj = new T.Object3D();
+const Obj = new T.Object3D();
 
 const Scene = new T.Scene();
 Scene.background = bgColor;
@@ -41,33 +41,38 @@ app.append(Renderer.domElement, Stat.dom);
 
 const Axes = new T.AxesHelper(5);
 
-const geo = new T.SphereGeometry(2, 32, 32);
-const mat = new T.MeshBasicMaterial({
-  color: "orange",
-  wireframe,
-});
-// const mesh = new T.Mesh(geo, mat)
+const lightCover = new T.Mesh(
+  new T.SphereGeometry(2, 32, 32),
+  new T.MeshBasicMaterial({ color: "orange" }),
+);
+const pointLight = new T.PointLight("orange", 2);
 
-Camera.position.z = 50;
+lightCover.add(pointLight);
+
+const dirLight = new T.AmbientLight(0xffffff);
+
+const geo = new T.BoxGeometry(5, 5, 5);
+const mat = new T.MeshPhongMaterial({
+  // color: "orange",
+  map: new T.TextureLoader().load("/kene.jpg"),
+});
+
+for (let i = 5; i < 100; i++) {
+  Mesh = new T.Mesh(geo, mat);
+  Mesh.position.x = i * (Math.random() - 0.5) * 5;
+  Mesh.position.y = i * (Math.random() - 0.5) * 5;
+  Mesh.position.z = i * (Math.random() - 0.5) * 5;
+
+  Obj.add(Mesh);
+}
+
+Camera.position.z = 25;
 
 const controls = new OrbitControls(Camera, Renderer.domElement);
 controls.minDistance = 0;
 controls.maxDistance = 500;
 
-for (const s of [Axes]) Scene.add(s);
-
-for (let i = 0; i < 100; i++) {
-  Mesh = new T.Mesh(geo, mat);
-  // obj.add(Mesh);
-
-  Mesh.position.x = i * (Math.random() - 0.5) * 10;
-  Mesh.position.y = i * (Math.random() - 0.5) * 10;
-  Mesh.position.z = i * (Math.random() - 0.5) * 10;
-
-  obj.add(Mesh);
-}
-
-Scene.add(obj);
+for (const s of [Axes, Obj, lightCover, dirLight]) Scene.add(s);
 
 function handleResize() {
   const [_w, _h] = [window.innerWidth, window.innerHeight];
@@ -80,9 +85,16 @@ window.addEventListener("resize", handleResize);
 
 function animate() {
   requestAnimationFrame(animate);
+
+  const t = new Date().getTime() * 0.00025;
+
+  lightCover.position.x = Math.sin(t * -7) * 50;
+  lightCover.position.y = Math.cos(t * 7) * 50;
+  lightCover.position.z = Math.cos(t * -7) * 50;
+
   Renderer.render(Scene, Camera);
 
-  for (const s of obj.children) {
+  for (const s of Obj.children) {
     s.rotation.y += 0.01;
   }
 
