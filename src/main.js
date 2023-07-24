@@ -6,7 +6,7 @@ import eruda from "eruda";
 
 import { dq } from "./util.js";
 
-// eruda.init();
+//eruda.init();
 
 const log = console.log;
 
@@ -48,7 +48,7 @@ const mat = new T.MeshBasicMaterial({
 });
 // const mesh = new T.Mesh(geo, mat)
 
-Camera.position.z = 5;
+Camera.position.z = 50;
 
 const controls = new OrbitControls(Camera, Renderer.domElement);
 controls.minDistance = 0;
@@ -56,13 +56,15 @@ controls.maxDistance = 500;
 
 for (const s of [Axes]) Scene.add(s);
 
-for (let i = 0; i < 200; i++) {
+for (let i = 0; i < 100; i++) {
   Mesh = new T.Mesh(geo, mat);
-  obj.add(Mesh);
+  // obj.add(Mesh);
 
-  Mesh.position.x = i * Math.random() * -10;
-  Mesh.position.y = i * Math.random() * 10;
-  Mesh.position.z = i * Math.random() * 10;
+  Mesh.position.x = i * (Math.random() - 0.5) * 10;
+  Mesh.position.y = i * (Math.random() - 0.5) * 10;
+  Mesh.position.z = i * (Math.random() - 0.5) * 10;
+
+  obj.add(Mesh);
 }
 
 Scene.add(obj);
@@ -81,7 +83,6 @@ function animate() {
   Renderer.render(Scene, Camera);
 
   for (const s of obj.children) {
-    s.rotation.x += 0.01;
     s.rotation.y += 0.01;
   }
 
