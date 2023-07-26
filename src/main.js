@@ -6,7 +6,7 @@ import eruda from "eruda";
 
 import { dq } from "./util.js";
 
-eruda.init();
+// eruda.init();
 
 const log = console.log;
 
