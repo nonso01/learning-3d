@@ -6,7 +6,7 @@ import eruda from "eruda";
 
 import { dq } from "./util.js";
 
-// eruda.init();
+eruda.init();
 
 const log = console.log;
 
@@ -39,32 +39,44 @@ const Stat = new Stats();
 
 app.append(Renderer.domElement, Stat.dom);
 
-const Axes = new T.AxesHelper(5);
+const Axes = new T.AxesHelper(10);
+
+const particleCount = 1000
+const particleGroup = new T.Group()
+
+// 3d work below 
 
 const lightCover = new T.Mesh(
   new T.SphereGeometry(2, 32, 32),
-  new T.MeshBasicMaterial({ color: "orange" }),
+  new T.MeshBasicMaterial({ color: "white" }),
 );
-const pointLight = new T.PointLight("orange", 2);
+const pointLight = new T.PointLight("white", 2);
 
 lightCover.add(pointLight);
 
-const dirLight = new T.AmbientLight(0xffffff);
+const dirLight = new T.AmbientLight(0xffffff); // rm this later
 
-const geo = new T.BoxGeometry(5, 5, 5);
-const mat = new T.MeshPhongMaterial({
-  // color: "orange",
-  map: new T.TextureLoader().load("/kene.jpg"),
+const particle_geo = new T.SphereGeometry(.3, 32, 32);
+const particle_mat = new T.MeshPhongMaterial({
+  color: 0xccedff,
 });
 
-for (let i = 5; i < 100; i++) {
-  Mesh = new T.Mesh(geo, mat);
-  Mesh.position.x = i * (Math.random() - 0.5) * 5;
-  Mesh.position.y = i * (Math.random() - 0.5) * 5;
-  Mesh.position.z = i * (Math.random() - 0.5) * 5;
+for (let i = 10; i < particleCount; i++) {
+  Mesh = new T.Mesh(particle_geo, particle_mat);
+  Mesh.position.x = i * (Math.random() - 0.5) * 10;
+  Mesh.position.y = i * (Math.random() - 0.5) * 10;
+  Mesh.position.z = i * (Math.random() - 0.5) * 10;
 
-  Obj.add(Mesh);
+  particleGroup.add(Mesh);
 }
+
+
+const ring_geo = new T.RingGeometry(9.5, 10, 64)
+const ring_mat = new T.MeshBasicMaterial({
+  color: "silver",
+  side: T.DoubleSide
+})
+const ring = new T.Mesh(ring_geo, ring_mat)
 
 Camera.position.z = 25;
 
@@ -72,7 +84,7 @@ const controls = new OrbitControls(Camera, Renderer.domElement);
 controls.minDistance = 0;
 controls.maxDistance = 500;
 
-for (const s of [Axes, Obj, lightCover, dirLight]) Scene.add(s);
+for (const s of [Axes, Obj, lightCover, particleGroup, ring]) Scene.add(s);
 
 function handleResize() {
   const [_w, _h] = [window.innerWidth, window.innerHeight];
@@ -86,17 +98,18 @@ window.addEventListener("resize", handleResize);
 function animate() {
   requestAnimationFrame(animate);
 
-  const t = new Date().getTime() * 0.00025;
+  const t = new Date().getTime() * 0.000025;
 
-  lightCover.position.x = Math.sin(t * -7) * 50;
-  lightCover.position.y = Math.cos(t * 7) * 50;
-  lightCover.position.z = Math.cos(t * -7) * 50;
+  lightCover.position.x = Math.sin(t * -7) * 100;
+  lightCover.position.y = Math.cos(t * 7) * 100;
+  lightCover.position.z = Math.cos(t * -7) * 100;
+  
 
   Renderer.render(Scene, Camera);
 
-  for (const s of Obj.children) {
+  /*for (const s of Obj.children) {
     s.rotation.y += 0.01;
-  }
+  }*/
 
   Stat.update();
 }
