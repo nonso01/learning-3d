@@ -4,7 +4,7 @@ import Stats from "three/addons/libs/stats.module.js";
 
 import eruda from "eruda";
 
-import { dq } from "./util.js";
+import { dq, len } from "./util.js";
 
 // eruda.init();
 
@@ -13,6 +13,7 @@ const log = console.log;
 const app = dq("#app");
 
 const wireframe = true;
+const rS = 32;
 
 const [_w, _h] = [window.innerWidth, window.innerHeight];
 
@@ -39,30 +40,35 @@ const Stat = new Stats();
 
 app.append(Renderer.domElement, Stat.dom);
 
-const Axes = new T.AxesHelper(10);
+const Axes = new T.AxesHelper(100);
 
-const particleCount = 1000
-const particleGroup = new T.Group()
+const particleCount = 300;
+const particleGroup = new T.Group();
 
-// 3d work below 
+// 3d work below
 
-const lightCover = new T.Mesh(
-  new T.SphereGeometry(2, 32, 32),
+const pointLightCover = new T.Mesh(
+  new T.SphereGeometry(1.5, rS, rS),
   new T.MeshBasicMaterial({ color: "white" }),
 );
-const pointLight = new T.PointLight("white", 2);
+const pointLight = new T.PointLight("white", 4);
+pointLight.castShadow = true;
 
-lightCover.add(pointLight);
+pointLightCover.add(pointLight);
 
-const dirLight = new T.AmbientLight(0xffffff); // rm this later
+const dirLight = new T.DirectionalLight(0xffffff); // rm this later
+dirLight.castShadow = true;
 
-const particle_geo = new T.SphereGeometry(.3, 32, 32);
+const particle_geo = new T.SphereGeometry(0.2, rS, rS);
 const particle_mat = new T.MeshPhongMaterial({
   color: 0xccedff,
 });
 
+
+
 for (let i = 10; i < particleCount; i++) {
-  Mesh = new T.Mesh(particle_geo, particle_mat);
+  Mesh =  new T.Mesh(particle_geo, particle_mat);
+  
   Mesh.position.x = i * (Math.random() - 0.5) * 10;
   Mesh.position.y = i * (Math.random() - 0.5) * 10;
   Mesh.position.z = i * (Math.random() - 0.5) * 10;
@@ -70,21 +76,37 @@ for (let i = 10; i < particleCount; i++) {
   particleGroup.add(Mesh);
 }
 
+const plane_geo = new T.PlaneGeometry(100, 100);
+const plane_mat = new T.MeshPhongMaterial({
+  color: 0x212121,
+  side: T.DoubleSide,
+});
+const plane = new T.Mesh(plane_geo, plane_mat);
 
-const ring_geo = new T.RingGeometry(9.5, 10, 64)
-const ring_mat = new T.MeshBasicMaterial({
-  color: "silver",
-  side: T.DoubleSide
-})
-const ring = new T.Mesh(ring_geo, ring_mat)
+plane.rotation.x = 1.57;
 
-Camera.position.z = 25;
+const m = new T.LineBasicMaterial({ color: "blue"})
+
+const p = [
+new T.Vector3(-40, 30, 10),
+new T.Vector3(20, 50, 0),
+new T.Vector3(40, 5, 0),
+new T.Vector3(-40, 30, 10)
+]
+
+const g = new T.BufferGeometry().setFromPoints(p)
+
+const l = new T.Line(g, m)
+Scene.add(l)
+
+Camera.position.z = Camera.position.y = Camera.position.x = 50;
 
 const controls = new OrbitControls(Camera, Renderer.domElement);
 controls.minDistance = 0;
 controls.maxDistance = 500;
 
-for (const s of [Axes, Obj, lightCover, particleGroup, ring]) Scene.add(s);
+for (const s of [ Obj, pointLightCover, dirLight, particleGroup, plane])
+  Scene.add(s);
 
 function handleResize() {
   const [_w, _h] = [window.innerWidth, window.innerHeight];
@@ -98,19 +120,13 @@ window.addEventListener("resize", handleResize);
 function animate() {
   requestAnimationFrame(animate);
 
-  const t = new Date().getTime() * 0.000025;
+  const t = new Date().getTime() * 0.0002;
 
-  lightCover.position.x = Math.sin(t * -7) * 100;
-  lightCover.position.y = Math.cos(t * 7) * 100;
-  lightCover.position.z = Math.cos(t * -7) * 100;
-  
+  pointLightCover.position.x = Math.sin(t * -7) * 75;
+  pointLightCover.position.y = Math.cos(t * 7) * 75;
+  pointLightCover.position.z = Math.cos(t * -7) * 50;
 
   Renderer.render(Scene, Camera);
-
-  /*for (const s of Obj.children) {
-    s.rotation.y += 0.01;
-  }*/
-
   Stat.update();
 }
 animate();
