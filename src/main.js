@@ -1,12 +1,15 @@
 import * as T from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls";
+import { TextGeometry } from "three/addons/geometries/TextGeometry";
+import { FontLoader } from "three/addons/loaders/FontLoader";
+
 import Stats from "three/addons/libs/stats.module.js";
 
 import eruda from "eruda";
 
 import { dq, len } from "./util.js";
 
-// eruda.init();
+eruda.init();
 
 const log = console.log;
 
@@ -35,6 +38,8 @@ const Renderer = new T.WebGLRenderer({
 
 Renderer.setPixelRatio(window.devicePixelRatio);
 Renderer.setSize(_w, _h);
+Renderer.shadowMap.enabled = true;
+Renderer.shadowMap.type = T.PCFSoftShadowMap;
 
 const Stat = new Stats();
 
@@ -64,11 +69,9 @@ const particle_mat = new T.MeshPhongMaterial({
   color: 0xccedff,
 });
 
-
-
 for (let i = 10; i < particleCount; i++) {
-  Mesh =  new T.Mesh(particle_geo, particle_mat);
-  
+  Mesh = new T.Mesh(particle_geo, particle_mat);
+
   Mesh.position.x = i * (Math.random() - 0.5) * 10;
   Mesh.position.y = i * (Math.random() - 0.5) * 10;
   Mesh.position.z = i * (Math.random() - 0.5) * 10;
@@ -83,21 +86,26 @@ const plane_mat = new T.MeshPhongMaterial({
 });
 const plane = new T.Mesh(plane_geo, plane_mat);
 
+plane.receiveShadow = true;
 plane.rotation.x = 1.57;
 
-const m = new T.LineBasicMaterial({ color: "blue"})
-
-const p = [
-new T.Vector3(-40, 30, 10),
-new T.Vector3(20, 50, 0),
-new T.Vector3(40, 5, 0),
-new T.Vector3(-40, 30, 10)
-]
-
-const g = new T.BufferGeometry().setFromPoints(p)
-
-const l = new T.Line(g, m)
-Scene.add(l)
+{
+  let a = new FontLoader().load(
+    "/node_modules/three/examples/fonts/droid/droid_sans_regular.typeface.json",
+    (font) => {
+      let b = new TextGeometry("nonso01", {
+        font,
+        size: 15,
+        height: 5,
+      });
+      let m = new T.MeshPhongMaterial({ color: 0x454545 });
+      let f = new T.Mesh(b, m);
+      f.castShadow = true;
+      f.position.set(-30, 10, 0);
+      Scene.add(f);
+    },
+  );
+}
 
 Camera.position.z = Camera.position.y = Camera.position.x = 50;
 
@@ -105,7 +113,7 @@ const controls = new OrbitControls(Camera, Renderer.domElement);
 controls.minDistance = 0;
 controls.maxDistance = 500;
 
-for (const s of [ Obj, pointLightCover, dirLight, particleGroup, plane])
+for (const s of [Obj, pointLightCover, dirLight, particleGroup, plane])
   Scene.add(s);
 
 function handleResize() {
