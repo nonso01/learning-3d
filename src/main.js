@@ -9,7 +9,7 @@ import eruda from "eruda";
 
 import { dq, len } from "./util.js";
 
-eruda.init();
+// eruda.init();
 
 const log = console.log;
 
@@ -91,7 +91,7 @@ plane.rotation.x = 1.57;
 
 {
   let a = new FontLoader().load(
-    "/node_modules/three/examples/fonts/droid/droid_sans_regular.typeface.json",
+    "/droid_sans_regular.typeface.json",
     (font) => {
       let b = new TextGeometry("nonso01", {
         font,
