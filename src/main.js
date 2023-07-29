@@ -9,7 +9,7 @@ import eruda from "eruda";
 
 import { dq, len } from "./util.js";
 
-// eruda.init();
+//eruda.init();
 
 const log = console.log;
 
@@ -28,7 +28,7 @@ let Mesh; // custom
 const Obj = new T.Object3D();
 
 const Scene = new T.Scene();
-Scene.background = bgColor;
+// Scene.background = bgColor
 
 const Camera = new T.PerspectiveCamera(75, _w / _h, 0.1, 1000);
 
@@ -45,10 +45,8 @@ const Stat = new Stats();
 
 app.append(Renderer.domElement, Stat.dom);
 
-const Axes = new T.AxesHelper(100);
 
 const particleCount = 300;
-const particleGroup = new T.Group();
 
 // 3d work below
 
@@ -62,9 +60,13 @@ pointLight.castShadow = true;
 pointLightCover.add(pointLight);
 
 const dirLight = new T.DirectionalLight(0xffffff); // rm this later
-dirLight.castShadow = true;
+// dirLight.castShadow = true;
 
-const particle_geo = new T.SphereGeometry(0.2, rS, rS);
+const Axes = new T.AxesHelper(100);
+
+const particleGroup = new T.Group();
+
+const particle_geo = new T.SphereGeometry(.3, rS, rS);
 const particle_mat = new T.MeshPhongMaterial({
   color: 0xccedff,
 });
@@ -83,6 +85,7 @@ const plane_geo = new T.PlaneGeometry(100, 100);
 const plane_mat = new T.MeshPhongMaterial({
   color: 0x212121,
   side: T.DoubleSide,
+  map: new T.TextureLoader().load("/javascript.svg")
 });
 const plane = new T.Mesh(plane_geo, plane_mat);
 
@@ -96,9 +99,9 @@ plane.rotation.x = 1.57;
       let b = new TextGeometry("nonso01", {
         font,
         size: 15,
-        height: 5,
+        height: 3,
       });
-      let m = new T.MeshPhongMaterial({ color: 0x454545 });
+      let m = new T.MeshPhongMaterial({ color: "orange" });
       let f = new T.Mesh(b, m);
       f.castShadow = true;
       f.position.set(-30, 10, 0);
@@ -107,7 +110,7 @@ plane.rotation.x = 1.57;
   );
 }
 
-Camera.position.z = Camera.position.y = Camera.position.x = 50;
+Camera.position.z = Camera.position.y = Camera.position.x = 75;
 
 const controls = new OrbitControls(Camera, Renderer.domElement);
 controls.minDistance = 0;
@@ -133,6 +136,8 @@ function animate() {
   pointLightCover.position.x = Math.sin(t * -7) * 75;
   pointLightCover.position.y = Math.cos(t * 7) * 75;
   pointLightCover.position.z = Math.cos(t * -7) * 50;
+  
+  particleGroup.position.x += 0.05
 
   Renderer.render(Scene, Camera);
   Stat.update();
