@@ -1,17 +1,17 @@
 {
-  "name": "learning-3d",
-  "version": "1.0.0",
+  "name": "glsl",
+  "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --open",
+    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
-  "dependencies": {
-    "three": "^0.154.0"
-  },
   "devDependencies": {
-    "vite": "^4.4.0",
-    "eruda": "^3.0.0"
+    "vite": "^5.4.1"
+  },
+  "dependencies": {
+    "three": "^0.168.0"
   }
 }
