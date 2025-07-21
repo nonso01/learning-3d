@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
 import { MTLLoader } from "three/addons/loaders/MTLLoader.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 
 const wireframe = true;
@@ -30,10 +31,6 @@ const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
 directionalLight.position.set(0, 1, 1).normalize();
 scene.add(directionalLight);
 scene.add(ambientLight);
-// const geometry = new THREE.TorusKnotGeometry(1.4, .5, 100, 64);
-// const material = new THREE.MeshNormalMaterial();
-// const cube = new THREE.Mesh(geometry, material);
-// scene.add(cube);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 camera.position.z = 5;
@@ -49,21 +46,31 @@ window.onresize = () => {
   renderer.setSize(innerWidth, innerHeight);
 };
 
-{
-  const objLoader = new OBJLoader();
-  objLoader.load("/m.obj", (root) => {
-    scene.add(root);
-  });
+// {
+//   const objLoader = new OBJLoader();
+//   objLoader.load("/m.obj", (root) => {
+//     scene.add(root);
+//   });
 
-  const mtlLoader = new MTLLoader();
-  mtlLoader.load("/m.mtl", (mtl) => {
-    mtl.preload();
-    // mtl.materials.Material.side = THREE.DoubleSide;
-    objLoader.setMaterials(mtl);
-    objLoader.load("/m.obj", (root) => {
-      gui.add(root, "visible").name("visible");
-      scene.add(root);
-    });
+//   const mtlLoader = new MTLLoader();
+//   mtlLoader.load("/m.mtl", (mtl) => {
+//     mtl.preload();
+//     objLoader.setMaterials(mtl);
+//     objLoader.load("/m.obj", (root) => {
+//       gui.add(root, "visible").name("visible");
+//       scene.add(root);
+//     });
+//   });
+// }
+
+{
+  // for gltf
+  const gltfLoader = new GLTFLoader();
+  const url = "/fornitures-house.gltf";
+
+  gltfLoader.load(url, (gltf) => {
+    const root = gltf.scene;
+    scene.add(root);
   });
 }
 
