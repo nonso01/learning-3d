@@ -39,7 +39,7 @@ let modelMaterials = []; // Store GLTF materials
 
 // GLTF Loader
 const gltfLoader = new GLTFLoader();
-const url = "/fornitures-house.gltf";
+const url = "/fornitures-house.glb";
 gltfLoader.load(
   url,
   (gltf) => {
