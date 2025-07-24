@@ -2,6 +2,7 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 
 const { innerHeight, innerWidth } = window;
@@ -51,10 +52,9 @@ const lightHelper = new THREE.DirectionalLightHelper(
 scene.add(lightHelper);
 
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true; 
+controls.enableDamping = true;
 controls.minDistance = 1.3;
 controls.maxDistance = 6;
-
 
 camera.position.set(0, 5, 5);
 controls.update();
@@ -66,8 +66,20 @@ let modelMaterials = [];
 // gui.add(directionalLight.shadow, "normalBias", 0, 0.1, 0.01).name("Shadow Normal Bias");
 
 // GLTF Loader
-const gltfLoader = new GLTFLoader();
+// const gltfLoader = new GLTFLoader();
+// const url = "/fornitures-house.glb";
+
+// GLTF Loader with DRACOLoader when online
+const loadingManager = new THREE.LoadingManager();
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath(
+  "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/draco/"
+);
+dracoLoader.setDecoderConfig( { type: 'js' } );
+const gltfLoader = new GLTFLoader(loadingManager);
+gltfLoader.setDRACOLoader(dracoLoader);
 const url = "/fornitures-house.glb";
+
 gltfLoader.load(
   url,
   (gltf) => {
