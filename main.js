@@ -52,15 +52,19 @@ gltfLoader.load(
       }
     });
     // Add GUI control for wireframe
-    gui.add(settings, "wireframe").name("Wireframe").onChange((value) => {
-      modelMaterials.forEach((material) => {
-        material.wireframe = value;
+    gui
+      .add(settings, "wireframe")
+      .name("Wireframe")
+      .onChange((value) => {
+        modelMaterials.forEach((material) => {
+          material.wireframe = value;
+        });
       });
-    });
   },
   (progress) => {
-    // log(`Loading model: ${(progress.loaded / progress.total * 100).toFixed(2)}%`);
-    log(progress.total)
+    log(
+      `Loading model: ${((progress.loaded / progress.total) * 100).toFixed(2)}%`
+    );
   },
   (error) => {
     log("Error loading GLTF model:", error);
