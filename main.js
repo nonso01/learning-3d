@@ -7,6 +7,8 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 const { innerHeight, innerWidth } = window;
 const log = console.log;
 
+const BG = 0x222222;
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -18,24 +20,50 @@ const app = document.querySelector("#app");
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Optimize for high-DPI
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 app.appendChild(renderer.domElement);
 
-scene.background = new THREE.Color(0xffffff);
+scene.background = new THREE.Color(BG);
 
-const ambientLight = new THREE.AmbientLight(0x404040, 1);
-const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
-directionalLight.position.set(0, 1, 1).normalize();
+const ambientLight = new THREE.AmbientLight(0x404040, 1.5); // Increased intensity
+const directionalLight = new THREE.DirectionalLight(0xffffff, 3); // Reduced intensity
+directionalLight.position.set(0, 10, 10);
+directionalLight.castShadow = true;
+directionalLight.shadow.mapSize = new THREE.Vector2(1024, 1024);
+directionalLight.shadow.camera.left = -15; // Wider bounds
+directionalLight.shadow.camera.right = 15;
+directionalLight.shadow.camera.top = 15;
+directionalLight.shadow.camera.bottom = -15;
+directionalLight.shadow.camera.near = 0.1; // Tighter near plane
+directionalLight.shadow.camera.far = 50;
+directionalLight.shadow.bias = -0.0001; // Reduce shadow acne
+directionalLight.shadow.normalBias = 0.05; // Adjust for surface normals
 scene.add(directionalLight);
 scene.add(ambientLight);
 
+const lightHelper = new THREE.DirectionalLightHelper(
+  directionalLight,
+  5,
+  0xff0000
+);
+scene.add(lightHelper);
+
 const controls = new OrbitControls(camera, renderer.domElement);
-camera.position.z = 5;
+controls.enableDamping = true; 
+controls.minDistance = 1.3;
+controls.maxDistance = 6;
+
+
+camera.position.set(0, 5, 5);
 controls.update();
 
 const gui = new GUI();
-const settings = { wireframe: false }; // Control state
-let modelMaterials = []; // Store GLTF materials
+const settings = { wireframe: false };
+let modelMaterials = [];
+
+// gui.add(directionalLight.shadow, "normalBias", 0, 0.1, 0.01).name("Shadow Normal Bias");
 
 // GLTF Loader
 const gltfLoader = new GLTFLoader();
@@ -44,14 +72,16 @@ gltfLoader.load(
   url,
   (gltf) => {
     const root = gltf.scene;
-    scene.add(root);
-    // Collect all materials from the model
     root.traverse((child) => {
-      if (child.isMesh && child.material) {
-        modelMaterials.push(child.material);
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+        if (child.material) {
+          modelMaterials.push(child.material);
+        }
       }
     });
-    // Add GUI control for wireframe
+    scene.add(root);
     gui
       .add(settings, "wireframe")
       .name("Wireframe")
@@ -86,7 +116,7 @@ const resizeRendererToDisplaySize = () => {
 };
 
 function animate() {
-  resizeRendererToDisplaySize(); // Check resize every frame
+  resizeRendererToDisplaySize();
   controls.update();
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
