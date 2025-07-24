@@ -59,7 +59,8 @@ gltfLoader.load(
     });
   },
   (progress) => {
-    log(`Loading model: ${(progress.loaded / progress.total * 100).toFixed(2)}%`);
+    // log(`Loading model: ${(progress.loaded / progress.total * 100).toFixed(2)}%`);
+    log(progress.total)
   },
   (error) => {
     log("Error loading GLTF model:", error);
