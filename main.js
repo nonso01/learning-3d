@@ -53,6 +53,7 @@ scene.add(lightHelper);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
+controls.dampingFactor = 0.1;
 controls.minDistance = 1.3;
 controls.maxDistance = 6;
 
@@ -62,6 +63,10 @@ controls.update();
 const gui = new GUI();
 const settings = { wireframe: false };
 let modelMaterials = [];
+
+// gui for orbit controls
+gui.add(controls, "enableDamping").name("Enable Damping");
+gui.add(controls, "dampingFactor", 0, 1, 0.01).name("Damping Factor");
 
 // gui.add(directionalLight.shadow, "normalBias", 0, 0.1, 0.01).name("Shadow Normal Bias");
 
