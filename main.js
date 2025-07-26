@@ -32,11 +32,11 @@ const ambientLight = new THREE.AmbientLight(0x404040, 1.5); // Increased intensi
 const directionalLight = new THREE.DirectionalLight(0xffffff, 3); // Reduced intensity
 directionalLight.position.set(0, 10, 10);
 directionalLight.castShadow = true;
-directionalLight.shadow.mapSize = new THREE.Vector2(1024, 1024);
-directionalLight.shadow.camera.left = -15; // Wider bounds
-directionalLight.shadow.camera.right = 15;
-directionalLight.shadow.camera.top = 15;
-directionalLight.shadow.camera.bottom = -15;
+directionalLight.shadow.mapSize = new THREE.Vector2(2048, 2048);
+// directionalLight.shadow.camera.left = -15; // Wider bounds
+// directionalLight.shadow.camera.right = 15;
+// directionalLight.shadow.camera.top = 15;
+// directionalLight.shadow.camera.bottom = -15;
 directionalLight.shadow.camera.near = 0.1; // Tighter near plane
 directionalLight.shadow.camera.far = 50;
 directionalLight.shadow.bias = -0.0001; // Reduce shadow acne
@@ -54,8 +54,10 @@ scene.add(lightHelper);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.1;
-controls.minDistance = 1.3;
-controls.maxDistance = 6;
+controls.minDistance = 1;
+controls.maxDistance = 5.5;
+controls.maxPolarAngle = Math.PI / 2;
+//  log(controls)
 
 camera.position.set(0, 5, 5);
 controls.update();
@@ -65,7 +67,6 @@ const settings = { wireframe: false };
 let modelMaterials = [];
 
 // gui for orbit controls
-gui.add(controls, "enableDamping").name("Enable Damping");
 gui.add(controls, "dampingFactor", 0, 1, 0.01).name("Damping Factor");
 
 // gui.add(directionalLight.shadow, "normalBias", 0, 0.1, 0.01).name("Shadow Normal Bias");
@@ -80,7 +81,7 @@ const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath(
   "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/draco/"
 );
-dracoLoader.setDecoderConfig( { type: 'js' } );
+dracoLoader.setDecoderConfig({ type: "js" });
 const gltfLoader = new GLTFLoader(loadingManager);
 gltfLoader.setDRACOLoader(dracoLoader);
 const url = "/fornitures-house.glb";
@@ -110,7 +111,7 @@ gltfLoader.load(
   },
   (progress) => {
     log(
-      `Loading model: ${((progress.loaded / progress.total) * 100).toFixed(2)}%`
+      `Loading model: ${((progress.loaded / progress.total) * 100).toFixed(1)}%`
     );
   },
   (error) => {
