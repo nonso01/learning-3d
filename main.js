@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 
 const { innerHeight, innerWidth } = window;
@@ -28,12 +29,11 @@ app.appendChild(renderer.domElement);
 
 scene.background = new THREE.Color(BG);
 
-const ambientLight = new THREE.AmbientLight(0x404040, 1.5); // Increased intensity
-const directionalLight = new THREE.DirectionalLight(0xffffff, 3); // Reduced intensity
+const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
 directionalLight.position.set(0, 10, 10);
 directionalLight.castShadow = true;
 directionalLight.shadow.mapSize = new THREE.Vector2(2048, 2048);
-// directionalLight.shadow.camera.left = -15; // Wider bounds
+// directionalLight.shadow.camera.left = -15;
 // directionalLight.shadow.camera.right = 15;
 // directionalLight.shadow.camera.top = 15;
 // directionalLight.shadow.camera.bottom = -15;
@@ -42,7 +42,6 @@ directionalLight.shadow.camera.far = 50;
 directionalLight.shadow.bias = -0.0001; // Reduce shadow acne
 directionalLight.shadow.normalBias = 0.05; // Adjust for surface normals
 scene.add(directionalLight);
-scene.add(ambientLight);
 
 const lightHelper = new THREE.DirectionalLightHelper(
   directionalLight,
@@ -68,12 +67,22 @@ let modelMaterials = [];
 
 // gui for orbit controls
 gui.add(controls, "dampingFactor", 0, 1, 0.01).name("Damping Factor");
+gui.add(directionalLight, "intensity", 0, 5, 1).name("DirLight Intensity");
 
-// gui.add(directionalLight.shadow, "normalBias", 0, 0.1, 0.01).name("Shadow Normal Bias");
-
-// GLTF Loader
-// const gltfLoader = new GLTFLoader();
-// const url = "/fornitures-house.glb";
+// Load HDR environment map
+const rgbeLoader = new RGBELoader();
+rgbeLoader.load(
+  "/brown_photostudio_02_1k.hdr",
+  (texture) => {
+    texture.mapping = THREE.EquirectangularReflectionMapping;
+    scene.background = texture;
+    scene.environment = texture;
+  },
+  undefined,
+  (error) => {
+    log("Error loading HDR texture:", error);
+  }
+);
 
 // GLTF Loader with DRACOLoader when online
 const loadingManager = new THREE.LoadingManager();
@@ -94,6 +103,8 @@ gltfLoader.load(
       if (child.isMesh) {
         child.castShadow = true;
         child.receiveShadow = true;
+        log(child.name)
+
         if (child.material) {
           modelMaterials.push(child.material);
         }
@@ -110,9 +121,9 @@ gltfLoader.load(
       });
   },
   (progress) => {
-    log(
-      `Loading model: ${((progress.loaded / progress.total) * 100).toFixed(1)}%`
-    );
+    // log(
+    //   `Loading model: ${((progress.loaded / progress.total) * 100).toFixed(1)}%`
+    // );
   },
   (error) => {
     log("Error loading GLTF model:", error);
