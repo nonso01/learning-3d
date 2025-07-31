@@ -10,6 +10,7 @@ const { innerHeight, innerWidth } = window;
 const log = console.log;
 
 const BG = 0x222222;
+const RSpeed = 0.002;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -59,19 +60,16 @@ controls.maxPolarAngle = Math.PI / 2;
 camera.position.set(0, 5, 5);
 controls.update();
 
-// gui for orbit controls
-gui.add(controls, "dampingFactor", 0, 1, 0.01).name("Damping Factor");
-gui.add(directionalLight, "intensity", 0, 5, 1).name("DirLight Intensity");
-
-const geo = new THREE.BoxGeometry(2, 2, 1);
+const geo = new THREE.SphereGeometry(2, 32, 32);
 const mat = new THREE.MeshPhongMaterial({
   color: 0xfabc2e,
+  shininess: 1024,
 });
 const mesh = new THREE.Mesh(geo, mat);
 scene.add(mesh);
 
 // Load HDR environment map
-const rgbeLoader = new RGBELoader();
+// const rgbeLoader = new RGBELoader();
 // rgbeLoader.load(
 //   "/brown_photostudio_02_1k.hdr",
 //   (texture) => {
@@ -84,6 +82,14 @@ const rgbeLoader = new RGBELoader();
 //     log("Error loading HDR texture:", error);
 //   }
 // );
+
+function intiGUI() {
+  // gui for orbit controls
+  gui.add(controls, "dampingFactor", 0, 1, 0.01).name("Damping Factor");
+  gui.add(directionalLight, "intensity", 0, 5, 1).name("DirLight Intensity");
+  gui.add(mesh.material, "wireframe", true).name("wireframe");
+}
+intiGUI();
 
 // Resize handler
 const resizeRendererToDisplaySize = () => {
@@ -101,8 +107,8 @@ const resizeRendererToDisplaySize = () => {
 
 function animate() {
   resizeRendererToDisplaySize();
-  mesh.rotation.x += 0.001;
-  mesh.rotation.y += 0.001;
+  mesh.rotation.x += RSpeed;
+  mesh.rotation.z += RSpeed;
   controls.update();
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
