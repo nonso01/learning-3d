@@ -54,40 +54,42 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.1;
 controls.minDistance = 1;
 controls.maxDistance = 5.5;
-controls.maxPolarAngle = Math.PI / 2;
+// controls.maxPolarAngle = Math.PI / 2;
 //  log(controls)
 
 camera.position.set(0, 5, 5);
 controls.update();
 
 const geo = new THREE.SphereGeometry(2, 32, 32);
-const mat = new THREE.MeshPhongMaterial({
+const mat = new THREE.MeshStandardMaterial({
   color: 0xfabc2e,
-  shininess: 1024,
+  roughness: 0.2,
+  metalness: 0.1,
 });
 const mesh = new THREE.Mesh(geo, mat);
 scene.add(mesh);
 
 // Load HDR environment map
-// const rgbeLoader = new RGBELoader();
-// rgbeLoader.load(
-//   "/brown_photostudio_02_1k.hdr",
-//   (texture) => {
-//     texture.mapping = THREE.EquirectangularReflectionMapping;
-//     scene.background = texture;
-//     scene.environment = texture;
-//   },
-//   undefined,
-//   (error) => {
-//     log("Error loading HDR texture:", error);
-//   }
-// );
+const rgbeLoader = new RGBELoader();
+rgbeLoader.load(
+  "/brown_photostudio_02_1k.hdr",
+  (texture) => {
+    texture.mapping = THREE.EquirectangularReflectionMapping;
+    scene.background = texture;
+    scene.environment = texture;
+  },
+  undefined,
+  (error) => {
+    log("Error loading HDR texture:", error);
+  }
+);
 
 function intiGUI() {
   // gui for orbit controls
   gui.add(controls, "dampingFactor", 0, 1, 0.01).name("Damping Factor");
   gui.add(directionalLight, "intensity", 0, 5, 1).name("DirLight Intensity");
   gui.add(mesh.material, "wireframe", true).name("wireframe");
+  gui.add(mesh.material, "roughness", 0, 1, 0.05).name("roughness");
 }
 intiGUI();
 

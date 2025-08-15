@@ -5,10 +5,10 @@
 }
 
 html {
-  min-height: 100dvh;
+  height: 100dvh;
   body,
   #app {
-    min-height: inherit;
+    height: inherit;
   }
 }
 #app {
